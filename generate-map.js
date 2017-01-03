@@ -1,3 +1,5 @@
+var gameData = { map: {}} // import eventually? Maybe? Something?
+
 function vectorAdd (coordinate, vector) {
   var x = coordinate[0] + vector[0]
   var y = coordinate[1] + vector[1]
@@ -32,14 +34,43 @@ function isOutOfBounds (coordinate, range) {
 
 function generateRoom (coordinate) {
   // creates a new room object and exits
+  roomNumber++
+  var nextRoom = roomNumber + 1
+  gameData.map[roomNumber] = {
+		roomNumber : {
+			firstVisit : true,
+			displayName : 'Room Test',
+			description : 'This is the room description for room ' + roomNumber + '. You see a pile of socks.',
+			interactables : {
+				socks : { look : "It's a pile of socks. What do you want from me?" },
+			},
+			items : {
+				sock : {
+					displayName : 'White Sock',
+					description : "It's a friggin sock.",
+					use : function(){return useLightSource();},
+					quantity : 1,
+					hidden : true
+				}
+			},
+			exits : {
+				inside : {
+					displayName : 'north',
+					destination : nextRoom
+				}
+			},
+		},
+  }
+
+
   setCell(coordinate, 1)
 }
 
-function generateExits (coordinate, chance) {
+function generateOverlapExits (coordinate, chance) {
   // rolls the possibility of connecting to a previous room (i.e. loop)
   // creates exits if sucessful
   overlaps++
-  console.log('Hit edge, generateExits called')
+  console.log('Hit previous room, generateExits called')
 }
 
 function isRoom(coordinate, map) {
@@ -69,9 +100,9 @@ function generateEmptyMap (size) {
 
 // SETTINGS ####################
 
-var mapSize = 30
-var enoughRooms = 100
-var startingCoordinate = [15 , 15]
+var mapSize = 20
+var enoughRooms = 15
+var startingCoordinate = [10 , 10]
 
 // Generate empty map
 
@@ -80,6 +111,7 @@ var map = generateEmptyMap(mapSize)
 // Map Loop ##########################
 
 var numberOfRooms = 0
+var roomNumber = 0
 var overlaps = 0
 var wallBumps = 0
 var currentCoordinate = startingCoordinate
@@ -89,6 +121,7 @@ generateRoom(startingCoordinate)
 while (numberOfRooms < enoughRooms) {
   var direction = randomDirection()
   var nextCoordinate = vectorAdd(currentCoordinate, direction)
+
   if (isOutOfBounds(nextCoordinate)) {
     console.log('tried to go out of bounds')
     wallBumps++
@@ -97,7 +130,7 @@ while (numberOfRooms < enoughRooms) {
     numberOfRooms++
     currentCoordinate = nextCoordinate
   } else {
-    generateExits(nextCoordinate, .1)
+    generateOverlapExits(nextCoordinate, .05)
     currentCoordinate = nextCoordinate
     console.log('overlapping rooms')
   }

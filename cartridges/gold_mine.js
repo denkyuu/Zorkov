@@ -30,7 +30,7 @@ var gameData = {
 			},
 			exits : {
 				inside : {
-					displayName : 'Inside',
+					displayName : 'n' || 'North',
 					destination : 'Tunnel'
 				}
 			},
